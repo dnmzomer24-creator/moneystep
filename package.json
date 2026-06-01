@@ -1,0 +1,17 @@
+{
+  "name": "moneystep",
+  "version": "1.0.0",
+  "description": "Financial goal tracking web application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "localtunnel": "^2.0.2",
+    "sqlite3": "^5.1.7"
+  }
+}

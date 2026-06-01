@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MONEYSTEP - A modern, interactive financial goal tracking web application. Calculate how long it takes to reach your savings goals and stay motivated.">
+  <title>MONEYSTEP - Track Your Financial Journey</title>
+  
+  <!-- Google Fonts - Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Toast Notification System -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- AUTH SECTION -->
+  <section id="auth-section" class="auth-section">
+    <div class="auth-card-container">
+      <div class="brand-logo">
+        <i data-lucide="trending-up" class="logo-icon animate-bounce"></i>
+        <h1>MONEYSTEP</h1>
+      </div>
+      <p class="auth-subtitle">Step by step to your financial freedom.</p>
+      
+      <!-- Login Card -->
+      <div id="login-card" class="auth-card active-card">
+        <h2>Welcome Back</h2>
+        <p class="card-desc">Login to continue tracking your goals.</p>
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-username">Username</label>
+            <div class="input-wrapper">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="login-username" placeholder="Enter your username" required autocomplete="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-full">
+            <span>Log In</span>
+            <i data-lucide="arrow-right"></i>
+          </button>
+        </form>
+        <p class="auth-toggle-text">Don't have an account? <a href="#" id="show-register">Register here</a></p>
+      </div>
+
+      <!-- Register Card -->
+      <div id="register-card" class="auth-card">
+        <h2>Create Account</h2>
+        <p class="card-desc">Sign up to start tracking your savings step by step.</p>
+        <form id="register-form">
+          <div class="form-group">
+            <label for="register-username">Username</label>
+            <div class="input-wrapper">
+              <i data-lucide="user" class="input-icon"></i>
+              <input type="text" id="register-username" placeholder="Choose a username" required autocomplete="username">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-password">Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="lock" class="input-icon"></i>
+              <input type="password" id="register-password" placeholder="Min. 6 characters" required autocomplete="new-password">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="register-confirm-password">Confirm Password</label>
+            <div class="input-wrapper">
+              <i data-lucide="shield-check" class="input-icon"></i>
+              <input type="password" id="register-confirm-password" placeholder="Repeat your password" required autocomplete="new-password">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-full">
+            <span>Sign Up</span>
+            <i data-lucide="user-plus"></i>
+          </button>
+        </form>
+        <p class="auth-toggle-text">Already have an account? <a href="#" id="show-login">Log in here</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD SECTION -->
+  <section id="dashboard-section" class="dashboard-section hidden">
+    <!-- Navbar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <div class="brand-logo">
+          <i data-lucide="trending-up" class="logo-icon"></i>
+          <h2>MONEYSTEP</h2>
+        </div>
+        <div class="nav-actions">
+          <div class="user-pill">
+            <i data-lucide="user" class="user-icon"></i>
+            <span id="user-display-name">Username</span>
+          </div>
+          <button id="logout-btn" class="btn btn-outline btn-sm">
+            <i data-lucide="log-out"></i>
+            <span>Log Out</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="dashboard-container">
+      <!-- Grid Layout -->
+      <div class="dashboard-grid">
+        <!-- Column 1: Inputs & Calculator -->
+        <div class="dashboard-card card-calculator">
+          <div class="card-header">
+            <i data-lucide="calculator" class="card-icon-accent"></i>
+            <h3>Set Your Goal</h3>
+          </div>
+          <p class="card-sub">Input your target numbers to compute your saving steps.</p>
+          
+          <form id="goal-form">
+            <div class="form-group">
+              <label for="target-amount">Target Goal Amount (₺, $, €)</label>
+              <div class="input-wrapper input-money">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="target-amount" placeholder="0.00" min="1" step="any" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="current-savings">Your Current Savings</label>
+              <div class="input-wrapper input-money">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="current-savings" placeholder="0.00" min="0" step="any" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="daily-saving">Daily Saving Amount</label>
+              <div class="input-wrapper input-money">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="daily-saving" placeholder="0.00" min="0.01" step="any" required>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-success w-full mt-4">
+              <i data-lucide="save"></i>
+              <span>Save & Calculate Goal</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Column 2: Progress & Output Visualizer -->
+        <div class="dashboard-card card-progress">
+          <div class="card-header">
+            <i data-lucide="pie-chart" class="card-icon-accent"></i>
+            <h3>Progress Tracker</h3>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="progress-empty-state" class="empty-state">
+            <i data-lucide="sparkles" class="empty-icon"></i>
+            <h4>Ready to calculate?</h4>
+            <p>Fill out the financial goal details in the left panel to calculate steps and see your progress visualization here.</p>
+          </div>
+
+          <!-- Active Goal UI -->
+          <div id="progress-active-state" class="active-state hidden">
+            <!-- Radial Progress Circle -->
+            <div class="radial-progress-container">
+              <svg class="radial-progress-svg" viewBox="0 0 160 160">
+                <circle class="radial-bg" cx="80" cy="80" r="70"></circle>
+                <circle id="radial-bar" class="radial-bar" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="radial-text">
+                <span id="percent-val" class="percent-num">0%</span>
+                <span class="percent-lbl">Completed</span>
+              </div>
+            </div>
+
+            <!-- Goal Breakdown Cards -->
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-label">Remaining</span>
+                <span id="remaining-val" class="metric-value">$0.00</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Days Needed</span>
+                <span id="days-val" class="metric-value">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Months Needed</span>
+                <span id="months-val" class="metric-value">0.0</span>
+              </div>
+            </div>
+
+            <!-- Progress Bar Tracker -->
+            <div class="progress-bar-container">
+              <div class="progress-bar-header">
+                <span>Progress Detail</span>
+                <span id="pb-percent">0%</span>
+              </div>
+              <div class="pb-background">
+                <div id="pb-fill" class="pb-fill"></div>
+              </div>
+            </div>
+
+            <!-- Motivational Message Card -->
+            <div id="motivation-box" class="motivation-box">
+              <i data-lucide="award" class="motivation-icon"></i>
+              <div class="motivation-content">
+                <h4 id="motivation-title">Starting point!</h4>
+                <p id="motivation-desc">Take the first step, we will get there together.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 3: Live Currency & Conversion Converter -->
+        <div class="dashboard-card card-finance">
+          <div class="card-header">
+            <i data-lucide="globe" class="card-icon-accent"></i>
+            <h3>Financial Markets</h3>
+          </div>
+          <p class="card-sub">Live conversion rates based on USD (API Real-time updates).</p>
+          
+          <div class="rates-container">
+            <div class="rate-row">
+              <span class="rate-currency"><i data-lucide="dollar-sign" class="curr-icon"></i> USD / TRY</span>
+              <span id="rate-usd-try" class="rate-value">Loading...</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-currency"><i data-lucide="euro-sign" class="curr-icon"></i> EUR / USD</span>
+              <span id="rate-eur-usd" class="rate-value">Loading...</span>
+            </div>
+            <div class="rate-row">
+              <span class="rate-currency"><i data-lucide="pound-sign" class="curr-icon"></i> GBP / USD</span>
+              <span id="rate-gbp-usd" class="rate-value">Loading...</span>
+            </div>
+          </div>
+
+          <div class="converter-box">
+            <h4>Live Currency Calculator</h4>
+            <p class="converter-subtitle">See your target value in other currencies:</p>
+            <div class="converter-results">
+              <div class="conv-item">
+                <span class="conv-label">Target in EUR:</span>
+                <span id="conv-eur" class="conv-value">-</span>
+              </div>
+              <div class="conv-item">
+                <span class="conv-label">Target in TRY:</span>
+                <span id="conv-try" class="conv-value">-</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="api-status-badge">
+            <span class="dot-green"></span>
+            <span>API Source: open.er-api.com</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Calculator & Visualizer Section -->
+      <div class="dashboard-row mt-6">
+        <div class="dashboard-card card-tax">
+          <div class="card-header">
+            <i data-lucide="percent" class="card-icon-accent"></i>
+            <h3>Financial Tax & Savings Visualizer</h3>
+          </div>
+          <p class="card-sub">Estimate taxes on your annual gross income and visualize the net savings breakdown.</p>
+          
+          <div class="tax-grid">
+            <div class="tax-inputs">
+              <form id="tax-form">
+                <div class="form-group">
+                  <label for="tax-income">Annual Gross Income (₺, $, €)</label>
+                  <div class="input-wrapper input-money">
+                    <span class="currency-symbol">$</span>
+                    <input type="number" id="tax-income" placeholder="0.00" min="0" step="any" value="120000" required>
+                  </div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="tax-rate-slider">Estimated Tax Rate: <span id="tax-rate-display" class="font-bold">25%</span></label>
+                  <div class="slider-wrapper">
+                    <input type="range" id="tax-rate-slider" min="5" max="50" step="1" value="25" class="slider-input">
+                  </div>
+                </div>
+                
+                <div class="tax-stats">
+                  <div class="tax-stat-row">
+                    <span>Gross Income:</span>
+                    <strong id="stat-gross">$120,000.00</strong>
+                  </div>
+                  <div class="tax-stat-row">
+                    <span>Tax Deductions (<span id="stat-tax-pct">25</span>%):</span>
+                    <strong id="stat-tax" class="text-danger">-$30,000.00</strong>
+                  </div>
+                  <div class="tax-stat-row border-top">
+                    <span>Estimated Net Income:</span>
+                    <strong id="stat-net" class="text-success">$90,000.00</strong>
+                  </div>
+                </div>
+              </form>
+            </div>
+            
+            <div class="tax-chart-wrapper">
+              <canvas id="taxChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <p>© 2026 MONEYSTEP. Developed for your financial wellness. Step by step, goal by goal.</p>
+    </div>
+  </footer>
+
+  <!-- App JavaScript logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>
