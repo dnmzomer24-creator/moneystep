@@ -10,7 +10,7 @@ const state = {
   user: null,
   goal: null,
   rates: {
-    TRY: 0,
+    USD: 0,
     EUR: 0,
     GBP: 0
   }
@@ -53,10 +53,10 @@ const motivationDesc = document.getElementById('motivation-desc');
 
 // Currency elements
 const usdTryEl = document.getElementById('rate-usd-try');
-const eurUsdEl = document.getElementById('rate-eur-usd');
-const gbpUsdEl = document.getElementById('rate-gbp-usd');
+const eurTryEl = document.getElementById('rate-eur-try');
+const gbpTryEl = document.getElementById('rate-gbp-try');
 const convEurEl = document.getElementById('conv-eur');
-const convTryEl = document.getElementById('conv-try');
+const convUsdEl = document.getElementById('conv-usd');
 
 // Toast Notification System
 function showToast(message, type = 'info') {
@@ -283,7 +283,7 @@ function renderGoalMetrics(goal) {
   progressActiveState.classList.remove('hidden');
 
   // Format values
-  const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const formatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0, maximumFractionDigits: 2 });
   
   // Clean currency symbols from label outputs depending on currency choice, but use a clean representation
   remainingVal.textContent = formatter.format(goal.remaining_amount);
@@ -352,19 +352,25 @@ async function fetchExchangeRates() {
     if (!res.ok) throw new Error('API fetch failed');
     const data = await res.json();
     
+    const usdTry = data.rates.TRY;
+    const eurTry = data.rates.TRY / data.rates.EUR;
+    const gbpTry = data.rates.TRY / data.rates.GBP;
+
     // Cache rates
-    state.rates.TRY = data.rates.TRY;
-    state.rates.EUR = data.rates.EUR;
-    state.rates.GBP = data.rates.GBP;
+    state.rates.USD = usdTry;
+    state.rates.EUR = eurTry;
+    state.rates.GBP = gbpTry;
 
     // Render currency rows
-    usdTryEl.textContent = `${data.rates.TRY.toFixed(2)} ₺`;
-    // We want EUR / USD representation: EUR/USD rate is 1 / EUR value relative to USD
-    const eurUsd = (1 / data.rates.EUR).toFixed(4);
-    const gbpUsd = (1 / data.rates.GBP).toFixed(4);
+    usdTryEl.textContent = `${usdTry.toFixed(4)} ₺`;
+    eurTryEl.textContent = `${eurTry.toFixed(4)} ₺`;
+    gbpTryEl.textContent = `${gbpTry.toFixed(4)} ₺`;
 
-    eurUsdEl.textContent = `$${eurUsd}`;
-    gbpUsdEl.textContent = `$${gbpUsd}`;
+    // Start the live ticker if it hasn't been started yet
+    if (!window.liveTickerStarted) {
+      window.liveTickerStarted = true;
+      initLiveRateTicker();
+    }
 
     // Update goals calculations if goal exists
     if (state.goal) {
@@ -373,8 +379,8 @@ async function fetchExchangeRates() {
   } catch (err) {
     console.error('Error fetching financial rates:', err);
     usdTryEl.textContent = 'Service unavailable';
-    eurUsdEl.textContent = 'Service unavailable';
-    gbpUsdEl.textContent = 'Service unavailable';
+    eurTryEl.textContent = 'Service unavailable';
+    gbpTryEl.textContent = 'Service unavailable';
   }
 }
 
@@ -382,19 +388,68 @@ async function fetchExchangeRates() {
 function updateTargetConversions(targetAmount) {
   if (!targetAmount) return;
 
+  if (state.rates.USD) {
+    const targetInUsd = targetAmount / state.rates.USD;
+    convUsdEl.textContent = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(targetInUsd);
+  } else {
+    convUsdEl.textContent = '-';
+  }
+
   if (state.rates.EUR) {
-    const targetInEur = targetAmount * state.rates.EUR;
-    convEurEl.textContent = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(targetInEur);
+    const targetInEur = targetAmount / state.rates.EUR;
+    convEurEl.textContent = new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }).format(targetInEur);
   } else {
     convEurEl.textContent = '-';
   }
+}
 
-  if (state.rates.TRY) {
-    const targetInTry = targetAmount * state.rates.TRY;
-    convTryEl.textContent = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(targetInTry);
-  } else {
-    convTryEl.textContent = '-';
-  }
+// --- LIVE EXCHANGES TICK TICKER SIMULATOR ---
+function initLiveRateTicker() {
+  setInterval(() => {
+    if (!state.token || !state.rates.USD) return;
+
+    // Small random fluctuations between -0.015% and +0.015%
+    const fluctuate = (rate) => {
+      const pct = (Math.random() - 0.5) * 0.0003; // Tiny percentage
+      const delta = rate * pct;
+      return { newVal: rate + delta, delta };
+    };
+
+    const updateUIWithTick = (el, oldVal, newVal) => {
+      if (!el) return;
+      el.textContent = `${newVal.toFixed(4)} ₺`;
+      
+      // Add visual color flash animation
+      if (newVal > oldVal) {
+        el.classList.add('rate-up');
+        setTimeout(() => el.classList.remove('rate-up'), 600);
+      } else if (newVal < oldVal) {
+        el.classList.add('rate-down');
+        setTimeout(() => el.classList.remove('rate-down'), 600);
+      }
+    };
+
+    const oldUsd = state.rates.USD;
+    const oldEur = state.rates.EUR;
+    const oldGbp = state.rates.GBP;
+
+    const usdTick = fluctuate(oldUsd);
+    const eurTick = fluctuate(oldEur);
+    const gbpTick = fluctuate(oldGbp);
+
+    state.rates.USD = usdTick.newVal;
+    state.rates.EUR = eurTick.newVal;
+    state.rates.GBP = gbpTick.newVal;
+
+    updateUIWithTick(usdTryEl, oldUsd, state.rates.USD);
+    updateUIWithTick(eurTryEl, oldEur, state.rates.EUR);
+    updateUIWithTick(gbpTryEl, oldGbp, state.rates.GBP);
+
+    // Update converters and target calculations in real-time
+    if (state.goal) {
+      updateTargetConversions(state.goal.target_amount);
+    }
+  }, 2500); // Fluctuate every 2.5 seconds
 }
 
 
@@ -471,7 +526,7 @@ function updateTaxCalculator() {
   taxRateDisplay.textContent = `${rate}%`;
   statTaxPct.textContent = rate;
 
-  const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const formatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', minimumFractionDigits: 0, maximumFractionDigits: 2 });
   statGross.textContent = formatter.format(gross);
   statTax.textContent = `-${formatter.format(deductions)}`;
   statNet.textContent = formatter.format(net);

@@ -132,9 +132,9 @@
           
           <form id="goal-form">
             <div class="form-group">
-              <label for="target-amount">Target Goal Amount (₺, $, €)</label>
+              <label for="target-amount">Target Goal Amount (₺)</label>
               <div class="input-wrapper input-money">
-                <span class="currency-symbol">$</span>
+                <span class="currency-symbol">₺</span>
                 <input type="number" id="target-amount" placeholder="0.00" min="1" step="any" required>
               </div>
             </div>
@@ -142,7 +142,7 @@
             <div class="form-group">
               <label for="current-savings">Your Current Savings</label>
               <div class="input-wrapper input-money">
-                <span class="currency-symbol">$</span>
+                <span class="currency-symbol">₺</span>
                 <input type="number" id="current-savings" placeholder="0.00" min="0" step="any" required>
               </div>
             </div>
@@ -150,7 +150,7 @@
             <div class="form-group">
               <label for="daily-saving">Daily Saving Amount</label>
               <div class="input-wrapper input-money">
-                <span class="currency-symbol">$</span>
+                <span class="currency-symbol">₺</span>
                 <input type="number" id="daily-saving" placeholder="0.00" min="0.01" step="any" required>
               </div>
             </div>
@@ -194,7 +194,7 @@
             <div class="metrics-grid">
               <div class="metric-box">
                 <span class="metric-label">Remaining</span>
-                <span id="remaining-val" class="metric-value">$0.00</span>
+                <span id="remaining-val" class="metric-value">₺0.00</span>
               </div>
               <div class="metric-box">
                 <span class="metric-label">Days Needed</span>
@@ -239,15 +239,15 @@
           <div class="rates-container">
             <div class="rate-row">
               <span class="rate-currency"><i data-lucide="dollar-sign" class="curr-icon"></i> USD / TRY</span>
-              <span id="rate-usd-try" class="rate-value">Loading...</span>
+              <span id="rate-usd-try" class="rate-value animate-pulse">Loading...</span>
             </div>
             <div class="rate-row">
-              <span class="rate-currency"><i data-lucide="euro-sign" class="curr-icon"></i> EUR / USD</span>
-              <span id="rate-eur-usd" class="rate-value">Loading...</span>
+              <span class="rate-currency"><i data-lucide="euro-sign" class="curr-icon"></i> EUR / TRY</span>
+              <span id="rate-eur-try" class="rate-value animate-pulse">Loading...</span>
             </div>
             <div class="rate-row">
-              <span class="rate-currency"><i data-lucide="pound-sign" class="curr-icon"></i> GBP / USD</span>
-              <span id="rate-gbp-usd" class="rate-value">Loading...</span>
+              <span class="rate-currency"><i data-lucide="pound-sign" class="curr-icon"></i> GBP / TRY</span>
+              <span id="rate-gbp-try" class="rate-value animate-pulse">Loading...</span>
             </div>
           </div>
 
@@ -256,12 +256,12 @@
             <p class="converter-subtitle">See your target value in other currencies:</p>
             <div class="converter-results">
               <div class="conv-item">
-                <span class="conv-label">Target in EUR:</span>
-                <span id="conv-eur" class="conv-value">-</span>
+                <span class="conv-label">Target in USD:</span>
+                <span id="conv-usd" class="conv-value">-</span>
               </div>
               <div class="conv-item">
-                <span class="conv-label">Target in TRY:</span>
-                <span id="conv-try" class="conv-value">-</span>
+                <span class="conv-label">Target in EUR:</span>
+                <span id="conv-eur" class="conv-value">-</span>
               </div>
             </div>
           </div>
@@ -286,9 +286,9 @@
             <div class="tax-inputs">
               <form id="tax-form">
                 <div class="form-group">
-                  <label for="tax-income">Annual Gross Income (₺, $, €)</label>
+                  <label for="tax-income">Annual Gross Income (₺)</label>
                   <div class="input-wrapper input-money">
-                    <span class="currency-symbol">$</span>
+                    <span class="currency-symbol">₺</span>
                     <input type="number" id="tax-income" placeholder="0.00" min="0" step="any" value="120000" required>
                   </div>
                 </div>
@@ -303,15 +303,15 @@
                 <div class="tax-stats">
                   <div class="tax-stat-row">
                     <span>Gross Income:</span>
-                    <strong id="stat-gross">$120,000.00</strong>
+                    <strong id="stat-gross">₺120,000.00</strong>
                   </div>
                   <div class="tax-stat-row">
                     <span>Tax Deductions (<span id="stat-tax-pct">25</span>%):</span>
-                    <strong id="stat-tax" class="text-danger">-$30,000.00</strong>
+                    <strong id="stat-tax" class="text-danger">-₺30,000.00</strong>
                   </div>
                   <div class="tax-stat-row border-top">
                     <span>Estimated Net Income:</span>
-                    <strong id="stat-net" class="text-success">$90,000.00</strong>
+                    <strong id="stat-net" class="text-success">₺90,000.00</strong>
                   </div>
                 </div>
               </form>
